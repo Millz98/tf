@@ -2,7 +2,7 @@ import tensorflow as tf
 from keras import layers, models
 from keras.datasets import mnist
 from keras.preprocessing.image import ImageDataGenerator
-from keras.applications import VGG16
+from keras.applications import EfficientNetB0
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -19,16 +19,12 @@ test_labels = tf.keras.utils.to_categorical(test_labels, num_classes=10)
 train_images_rgb = np.concatenate([train_images, train_images, train_images], axis=-1)
 test_images_rgb = np.concatenate([test_images, test_images, test_images], axis=-1)
 
-# Resize images to the expected shape
-resized_train_images = tf.image.resize(train_images_rgb, (32, 32))
-resized_test_images = tf.image.resize(test_images_rgb, (32, 32))
-
-# Create a more advanced CNN model using transfer learning (VGG16)
-base_model = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
+# Create a more advanced CNN model using transfer learning (EfficientNetB0)
+base_model = EfficientNetB0(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
 
 model = models.Sequential()
 
-# Add the VGG16 base model
+# Add the EfficientNetB0 base model
 model.add(base_model)
 
 # Add custom dense layers
@@ -51,13 +47,16 @@ datagen = ImageDataGenerator(
     fill_mode='nearest'
 )
 
+# Resize images to match the input shape expected by EfficientNetB0
+resized_images = tf.image.resize(train_images_rgb, (32, 32))
+
 # Train the model with data augmentation
-history = model.fit(datagen.flow(resized_train_images, train_labels, batch_size=32),
-                    steps_per_epoch=len(resized_train_images) / 32, epochs=10,
-                    validation_data=(resized_test_images, test_labels))
+history = model.fit(datagen.flow(resized_images, train_labels, batch_size=32),
+                    steps_per_epoch=len(train_images_rgb) / 32, epochs=10,
+                    validation_data=(tf.image.resize(test_images_rgb, (32, 32)), test_labels))
 
 # Evaluate the model
-test_loss, test_acc = model.evaluate(resized_test_images, test_labels)
+test_loss, test_acc = model.evaluate(test_images_rgb, test_labels)
 print(f'Test accuracy: {test_acc}')
 
 # Plot training history
