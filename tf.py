@@ -19,7 +19,7 @@ test_labels = tf.keras.utils.to_categorical(test_labels, num_classes=10)
 train_images_rgb = np.concatenate([train_images, train_images, train_images], axis=-1)
 test_images_rgb = np.concatenate([test_images, test_images, test_images], axis=-1)
 
-# Create a more advanced CNN model using transfer learning (EfficientNetB0)
+# Create a more advanced CNN model using EfficientNetB0
 base_model = EfficientNetB0(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
 
 model = models.Sequential()
@@ -27,14 +27,16 @@ model = models.Sequential()
 # Add the EfficientNetB0 base model
 model.add(base_model)
 
-# Add custom dense layers
+# Add custom dense layers with dropout and batch normalization
 model.add(layers.GlobalAveragePooling2D())
 model.add(layers.Dense(256, activation='relu'))
+model.add(layers.BatchNormalization())
 model.add(layers.Dropout(0.5))
 model.add(layers.Dense(10, activation='softmax'))
 
-# Compile the model
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+# Compile the model with a lower learning rate
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+              loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Adjust data augmentation input shape
 datagen = ImageDataGenerator(
@@ -47,13 +49,10 @@ datagen = ImageDataGenerator(
     fill_mode='nearest'
 )
 
-# Resize images to match the input shape expected by EfficientNetB0
-resized_images = tf.image.resize(train_images_rgb, (32, 32))
-
 # Train the model with data augmentation
-history = model.fit(datagen.flow(resized_images, train_labels, batch_size=32),
-                    steps_per_epoch=len(train_images_rgb) / 32, epochs=10,
-                    validation_data=(tf.image.resize(test_images_rgb, (32, 32)), test_labels))
+history = model.fit(datagen.flow(train_images_rgb, train_labels, batch_size=32),
+                    steps_per_epoch=len(train_images_rgb) / 32, epochs=20,
+                    validation_data=(test_images_rgb, test_labels))
 
 # Evaluate the model
 test_loss, test_acc = model.evaluate(test_images_rgb, test_labels)
