@@ -5,6 +5,7 @@ from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+import os
 
 
 # Load and preprocess the MNIST dataset
@@ -66,7 +67,7 @@ for i in range(10):
 
 
 # Load the image (replace 'Documents/Projects/tf/image2.png' with the actual path)
-image_path = 'Documents/Projects/tf/image2.png'
+image_path = '/Users/davemills/Documents/Projects/tf/image4.png'
 new_image = Image.open(image_path).convert('L')  # Convert to grayscale
 
 # Preprocess the image (assuming your model expects 28x28 images)
@@ -76,11 +77,17 @@ new_image = np.array(new_image) / 255.0  # Normalize pixel values to the range [
 # Add batch and channel dimensions to the image
 new_image = np.expand_dims(new_image, axis=(0, -1))
 
+# Print the current working directory
+print("Current Directory:", os.getcwd())
+
+# Print the files in the current directory
+print("Files in Directory:", os.listdir())
+
 # Make a prediction using the loaded model
 predictions = loaded_model.predict(new_image)
 predicted_label = np.argmax(predictions)
 
-print(f'Predicted label: {predicted_label}') 
+print(f'Predicted label: {predicted_label}')     
 
 # Plot training history
 plt.plot(history.history['accuracy'], label='accuracy')
