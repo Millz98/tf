@@ -77,12 +77,6 @@ new_image = np.array(new_image) / 255.0  # Normalize pixel values to the range [
 # Add batch and channel dimensions to the image
 new_image = np.expand_dims(new_image, axis=(0, -1))
 
-# Print the current working directory
-print("Current Directory:", os.getcwd())
-
-# Print the files in the current directory
-print("Files in Directory:", os.listdir())
-
 # Make a prediction using the loaded model
 predictions = loaded_model.predict(new_image)
 predicted_label = np.argmax(predictions)
