@@ -51,7 +51,7 @@ test_loss, test_acc = model.evaluate(test_images, test_labels)
 print(f'Test accuracy: {test_acc}')
 
 # Save model
-model.save('mnist_cnn_model.h5')
+model.save('my_model.keras')
 
 
 # Load model
