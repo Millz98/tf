@@ -1,8 +1,8 @@
 import tensorflow as tf
-from keras import layers, models
-from keras.datasets import mnist
-from keras.preprocessing.image import ImageDataGenerator
-from keras.applications import VGG16
+from tensorflow.keras import layers, models
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications import VGG16
 import numpy as np
 import matplotlib.pyplot as plt
 
