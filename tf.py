@@ -4,6 +4,8 @@ from keras.datasets import mnist
 from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
+
 
 # Load and preprocess the MNIST dataset
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
@@ -49,10 +51,36 @@ test_loss, test_acc = model.evaluate(test_images, test_labels)
 print(f'Test accuracy: {test_acc}')
 
 # Save model
-model.save('my_model.h5')
+model.save('mnist_cnn_model.h5')
+
 
 # Load model
 loaded_model = tf.keras.models.load_model('my_model.h5')
+
+# Visualize predictions
+for i in range(10):
+    plt.imshow(test_images[i].reshape(28, 28), cmap='gray')
+    plt.title(f'Actual: {np.argmax(test_labels[i])}, Predicted: {np.argmax(model.predict(test_images[i][np.newaxis, :, :, np.newaxis]))}')
+    plt.show()
+
+
+
+# Load the image (replace 'Documents/Projects/tf/image2.png' with the actual path)
+image_path = '/Users/davemills/Documents/Projects/tf/image2.png'
+new_image = Image.open(image_path).convert('L')  # Convert to grayscale
+
+# Preprocess the image (assuming your model expects 28x28 images)
+new_image = new_image.resize((28, 28))
+new_image = np.array(new_image) / 255.0  # Normalize pixel values to the range [0, 1]
+
+# Add batch and channel dimensions to the image
+new_image = np.expand_dims(new_image, axis=(0, -1))
+
+# Make a prediction
+predictions = model.predict(new_image)
+predicted_label = np.argmax(predictions)
+
+print(f'Predicted label: {predicted_label}')  
 
 # Plot training history
 plt.plot(history.history['accuracy'], label='accuracy')
