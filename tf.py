@@ -1,6 +1,5 @@
 import tensorflow as tf
 from keras import layers, models
-from keras import backend
 from keras.datasets import mnist
 from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
@@ -51,16 +50,12 @@ history = model.fit(datagen.flow(train_images, train_labels, batch_size=32),
 test_loss, test_acc = model.evaluate(test_images, test_labels)
 print(f'Test accuracy: {test_acc}')
 
-# Evaluate the model with augmented data
-history = model.evaluate(datagen.flow(test_images, test_labels, batch_size=32))
-
-
 # Save model
 model.save('my_model.keras')
 
 
 # Load model
-loaded_model = tf.keras.models.load_model('my_model.keras')
+loaded_model = tf.keras.models.load_model('my_model.h5')
 
 # Visualize predictions
 for i in range(10):
@@ -82,8 +77,8 @@ new_image = np.array(new_image) / 255.0  # Normalize pixel values to the range [
 new_image = np.expand_dims(new_image, axis=(0, -1))
 
 # Make a prediction
-predicted_probabilities = model.predict(new_image)
-predicted_label = np.argmax(predicted_probabilities)
+predictions = model.predict(new_image)
+predicted_label = np.argmax(predictions)
 
 print(f'Predicted label: {predicted_label}')  
 
