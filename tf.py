@@ -44,7 +44,7 @@ datagen = ImageDataGenerator(
 
 # Train the model with data augmentation
 history = model.fit(datagen.flow(train_images, train_labels, batch_size=32),
-                    steps_per_epoch=len(train_images) / 32, epochs=10,
+                    steps_per_epoch=len(train_images) / 32, epochs=10, # epochs=10 can be changed to a different value.
                     validation_data=(test_images, test_labels))
 
 # Evaluate the model
