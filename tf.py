@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import os
 
-
 # Load and preprocess the MNIST dataset
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 train_images = train_images.reshape((60000, 28, 28, 1)).astype('float32') / 255
@@ -39,13 +38,16 @@ datagen = ImageDataGenerator(
     shear_range=0.2,
     zoom_range=0.2,
     horizontal_flip=True,
-    fill_mode='nearest'
+    fill_mode='nearest',
+    validation_split=0.2 # Added this line to split the data into training and validation sets
 )
 
 # Train the model with data augmentation
-history = model.fit(datagen.flow(train_images, train_labels, batch_size=32),
+train_generator = datagen.flow(train_images, train_labels, batch_size=32)
+validation_generator = datagen.flow(train_images, train_labels, batch_size=32, subset='validation') # Added this line to create a validation generator
+history = model.fit(train_generator,
                     steps_per_epoch=len(train_images) / 32, epochs=10, # epochs=10 can be changed to a different value.
-                    validation_data=(test_images, test_labels))
+                    validation_data=validation_generator) # Changed test_images and test_labels to validation_generator
 
 # Evaluate the model
 test_loss, test_acc = model.evaluate(test_images, test_labels)
@@ -53,7 +55,6 @@ print(f'Test accuracy: {test_acc}')
 
 # Save model
 model.save('my_model.keras')
-
 
 # Load model
 loaded_model = tf.keras.models.load_model('my_model.keras')
@@ -63,8 +64,6 @@ for i in range(10):
     plt.imshow(test_images[i].reshape(28, 28), cmap='gray')
     plt.title(f'Actual: {np.argmax(test_labels[i])}, Predicted: {np.argmax(model.predict(test_images[i][np.newaxis, :, :, np.newaxis]))}')
     plt.show()
-
-
 
 # Load the image (replace 'Documents/Projects/tf/image2.png' with the actual path)
 image_path = '/Users/davemills/Documents/Projects/tf/image4.png'
